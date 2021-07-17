@@ -1,0 +1,19 @@
+mutation {
+  createNooble(input: {
+    title: "my_war",
+    description:"this is my last war",
+    category:"openings",
+    audio: "yo_mamas_house",
+    creator: {
+      id: "creator1"
+      name: "eren jager"
+      email: "jagerboii@gmail.com"
+    }
+  }
+  ) {
+    title
+    creator {
+      id
+    }
+  }
+}

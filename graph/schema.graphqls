@@ -1,0 +1,40 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Nooble {
+  id: ID!
+  title: String!
+  description: String!
+  category: String!
+  audio: String!
+  creator: Creator!
+}
+
+type Creator {
+  id: ID!
+  name: String!
+  email: String!
+}
+
+type Query {
+  noobles: [Nooble!]
+}
+
+input NewCreator {
+  id: ID!
+  name: String!
+  email: String!
+}
+
+input NewNooble{
+  title: String!
+  description: String!
+  category: String!
+  audio: String!
+  creator: NewCreator!
+}
+
+type Mutation {
+  createNooble(input: NewNooble!): Nooble!
+}

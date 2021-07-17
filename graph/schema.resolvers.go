@@ -5,22 +5,24 @@ package graph
 
 import (
 	"context"
+	"fmt"
+	"math/rand"
+	"strconv"
 
 	"github.com/ashwinp15/audio-directory/graph/generated"
 	"github.com/ashwinp15/audio-directory/graph/model"
 )
 
 func (r *mutationResolver) CreateNooble(ctx context.Context, input model.NewNooble) (*model.Nooble, error) {
+	id := strconv.Itoa(rand.Intn(1000000))
 	nooble := &model.Nooble{
+		ID:          id,
 		Title:       input.Title,
 		Description: input.Description,
 		Category:    input.Category,
-		Creator: &model.Creator{
-			ID:    input.Creator.ID,
-			Email: input.Creator.Email,
-			Name:  input.Creator.Name,
-		},
+		Audio:       input.File.Filename,
 	}
+	fmt.Printf("%v\n", nooble)
 	r.noobles = append(r.noobles, nooble)
 	return nooble, nil
 }

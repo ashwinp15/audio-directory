@@ -2,13 +2,15 @@
 #
 # https://gqlgen.com/getting-started/
 
+scalar Upload
+
 type Nooble {
   id: ID!
   title: String!
   description: String!
   category: String!
   audio: String!
-  creator: Creator!
+  creator: Creator
 }
 
 type Creator {
@@ -31,8 +33,7 @@ input NewNooble{
   title: String!
   description: String!
   category: String!
-  audio: String!
-  creator: NewCreator!
+  file: Upload!
 }
 
 type Mutation {

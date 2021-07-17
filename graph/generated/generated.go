@@ -238,13 +238,15 @@ var sources = []*ast.Source{
 #
 # https://gqlgen.com/getting-started/
 
+scalar Upload
+
 type Nooble {
   id: ID!
   title: String!
   description: String!
   category: String!
   audio: String!
-  creator: Creator!
+  creator: Creator
 }
 
 type Creator {
@@ -267,8 +269,7 @@ input NewNooble{
   title: String!
   description: String!
   category: String!
-  audio: String!
-  creator: NewCreator!
+  file: Upload!
 }
 
 type Mutation {
@@ -697,14 +698,11 @@ func (ec *executionContext) _Nooble_creator(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Creator)
 	fc.Result = res
-	return ec.marshalNCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx, field.Selections, res)
+	return ec.marshalOCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_noobles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1963,19 +1961,11 @@ func (ec *executionContext) unmarshalInputNewNooble(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
-		case "audio":
+		case "file":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("audio"))
-			it.Audio, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "creator":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("creator"))
-			it.Creator, err = ec.unmarshalNNewCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNewCreator(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+			it.File, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2099,9 +2089,6 @@ func (ec *executionContext) _Nooble(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "creator":
 			out.Values[i] = ec._Nooble_creator(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2414,16 +2401,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx context.Context, sel ast.SelectionSet, v *model.Creator) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Creator(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2437,11 +2414,6 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNNewCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNewCreator(ctx context.Context, v interface{}) (*model.NewCreator, error) {
-	res, err := ec.unmarshalInputNewCreator(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewNooble2githubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNewNooble(ctx context.Context, v interface{}) (model.NewNooble, error) {
@@ -2470,6 +2442,21 @@ func (ec *executionContext) unmarshalNString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
+	res, err := graphql.UnmarshalUpload(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v graphql.Upload) graphql.Marshaler {
+	res := graphql.MarshalUpload(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2729,6 +2716,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
+}
+
+func (ec *executionContext) marshalOCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx context.Context, sel ast.SelectionSet, v *model.Creator) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Creator(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalONooble2ᚕᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNoobleᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Nooble) graphql.Marshaler {

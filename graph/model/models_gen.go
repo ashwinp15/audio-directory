@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"github.com/99designs/gqlgen/graphql"
+)
+
 type Creator struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
@@ -15,11 +19,10 @@ type NewCreator struct {
 }
 
 type NewNooble struct {
-	Title       string      `json:"title"`
-	Description string      `json:"description"`
-	Category    string      `json:"category"`
-	Audio       string      `json:"audio"`
-	Creator     *NewCreator `json:"creator"`
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	Category    string         `json:"category"`
+	File        graphql.Upload `json:"file"`
 }
 
 type Nooble struct {

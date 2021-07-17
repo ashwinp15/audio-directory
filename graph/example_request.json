@@ -1,0 +1,3 @@
+{
+	 "query":"mutation updateAvatar($avatar:Upload!) {\n  updateAvatar(avatar: $avatar)\n}"
+}

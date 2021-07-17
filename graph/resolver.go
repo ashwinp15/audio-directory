@@ -9,3 +9,9 @@ import "github.com/ashwinp15/audio-directory/graph/model"
 type Resolver struct {
 	noobles []*model.Nooble
 }
+
+var ()
+
+func (r Resolver) uploadToDB() {
+
+}

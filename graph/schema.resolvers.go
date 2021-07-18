@@ -20,15 +20,17 @@ func (r *mutationResolver) CreateNooble(ctx context.Context, input model.NewNoob
 		Title:       input.Title,
 		Description: input.Description,
 		Category:    input.Category,
-		Audio:       input.File.Filename,
+		Audio:       input.File,
 	}
-	fmt.Printf("%v\n", nooble)
-	r.noobles = append(r.noobles, nooble)
+	fmt.Println("mutation resolved successfully")
+	r.nooble = nooble
+	r.uploadAudio()
+	fmt.Println("upload successful")
 	return nooble, nil
 }
 
 func (r *queryResolver) Noobles(ctx context.Context) ([]*model.Nooble, error) {
-	return r.noobles, nil
+	panic("not implementated")
 }
 
 // Mutation returns generated.MutationResolver implementation.

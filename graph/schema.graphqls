@@ -9,7 +9,7 @@ type Nooble {
   title: String!
   description: String!
   category: String!
-  audio: String!
+  audio: Upload!
   creator: Creator
 }
 

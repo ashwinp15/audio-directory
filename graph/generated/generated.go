@@ -245,7 +245,7 @@ type Nooble {
   title: String!
   description: String!
   category: String!
-  audio: String!
+  audio: Upload!
   creator: Creator
 }
 
@@ -668,9 +668,9 @@ func (ec *executionContext) _Nooble_audio(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(graphql.Upload)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Nooble_creator(ctx context.Context, field graphql.CollectedField, obj *model.Nooble) (ret graphql.Marshaler) {

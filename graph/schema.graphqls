@@ -9,8 +9,8 @@ type Nooble {
   title: String!
   description: String!
   category: String!
-  audio: Upload!
-  creator: Creator
+  audio: String!
+  creator: Creator!
 }
 
 type Creator {
@@ -20,11 +20,11 @@ type Creator {
 }
 
 type Query {
-  noobles: [Nooble!]
+  noobles: [Nooble]
+  nooble(id: ID): Nooble!
 }
 
 input NewCreator {
-  id: ID!
   name: String!
   email: String!
 }
@@ -34,6 +34,7 @@ input NewNooble{
   description: String!
   category: String!
   file: Upload!
+  creator: NewCreator!
 }
 
 type Mutation {

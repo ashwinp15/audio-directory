@@ -1,5 +1,1 @@
 package graph
-
-func DBconnect() {
-
-}

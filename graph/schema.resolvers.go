@@ -15,22 +15,25 @@ import (
 
 func (r *mutationResolver) CreateNooble(ctx context.Context, input model.NewNooble) (*model.Nooble, error) {
 	id := strconv.Itoa(rand.Intn(1000000))
-	nooble := &model.Nooble{
+	r.nooble = &model.Nooble{
 		ID:          id,
 		Title:       input.Title,
 		Description: input.Description,
 		Category:    input.Category,
-		Audio:       input.File,
+		Audio:       input.File.Filename,
 	}
 	fmt.Println("mutation resolved successfully")
-	r.nooble = nooble
-	r.uploadAudio()
+	r.PutNooble(input.File)
 	fmt.Println("upload successful")
-	return nooble, nil
+	return r.nooble, nil
 }
 
 func (r *queryResolver) Noobles(ctx context.Context) ([]*model.Nooble, error) {
-	panic("not implementated")
+	return r.ReadAllNoobles()
+}
+
+func (r *queryResolver) Nooble(ctx context.Context, id *string) (*model.Nooble, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.

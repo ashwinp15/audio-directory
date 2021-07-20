@@ -1,3 +1,9 @@
-{
-	 "query":"mutation updateAvatar($avatar:Upload!) {\n  updateAvatar(avatar: $avatar)\n}"
-}
+[
+	 {
+			"query":"mutation updateAvatar($avatar:Upload!) {\n  updateAvatar(avatar: $avatar)\n}"
+	 },
+
+	 {"query":"mutation($song: Upload!) {\n  createNooble(input: {\n    title: \"myWar\",\n    description:\"thisIsMyLastWar\",\n    category:\"openings\",\n  file:$song,\n }\n  ) {\n    title\n   description\n }\n}\n", "variables":{ "song": null}},
+
+	 { "File": ["variables.song"] }
+]

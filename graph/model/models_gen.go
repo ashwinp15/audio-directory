@@ -26,10 +26,10 @@ type NewNooble struct {
 }
 
 type Nooble struct {
-	ID          string         `json:"id"`
-	Title       string         `json:"title"`
-	Description string         `json:"description"`
-	Category    string         `json:"category"`
-	Audio       graphql.Upload `json:"audio"`
-	Creator     *Creator       `json:"creator"`
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Category    string   `json:"category"`
+	Audio       string   `json:"audio"`
+	Creator     *Creator `json:"creator"`
 }

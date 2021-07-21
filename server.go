@@ -7,6 +7,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/ashwinp15/audio-directory/database"
 	"github.com/ashwinp15/audio-directory/graph"
 	"github.com/ashwinp15/audio-directory/graph/generated"
 	"github.com/go-chi/chi"
@@ -19,6 +20,7 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+	defer database.PGclient.Close()
 
 	router := chi.NewRouter()
 	//router.Use(auth.Middleware())

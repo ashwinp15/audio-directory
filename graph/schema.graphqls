@@ -20,7 +20,7 @@ type Creator {
 
 type Query {
   noobles: [Nooble]
-  nooble(id: ID): Nooble!
+  nooble(id: ID!): Nooble!
 }
 
 input NewCreator {

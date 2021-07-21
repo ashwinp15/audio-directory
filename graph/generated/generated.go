@@ -63,7 +63,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Nooble  func(childComplexity int, id *string) int
+		Nooble  func(childComplexity int, id string) int
 		Noobles func(childComplexity int) int
 	}
 }
@@ -74,7 +74,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Noobles(ctx context.Context) ([]*model.Nooble, error)
-	Nooble(ctx context.Context, id *string) (*model.Nooble, error)
+	Nooble(ctx context.Context, id string) (*model.Nooble, error)
 }
 
 type executableSchema struct {
@@ -182,7 +182,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Nooble(childComplexity, args["id"].(*string)), true
+		return e.complexity.Query.Nooble(childComplexity, args["id"].(string)), true
 
 	case "Query.noobles":
 		if e.complexity.Query.Noobles == nil {
@@ -277,7 +277,7 @@ type Creator {
 
 type Query {
   noobles: [Nooble]
-  nooble(id: ID): Nooble!
+  nooble(id: ID!): Nooble!
 }
 
 input NewCreator {
@@ -354,10 +354,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_nooble_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+		arg0, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -825,7 +825,7 @@ func (ec *executionContext) _Query_nooble(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Nooble(rctx, args["id"].(*string))
+		return ec.resolvers.Query().Nooble(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2865,21 +2865,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
-}
-
-func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalID(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalID(*v)
 }
 
 func (ec *executionContext) marshalONooble2ᚕᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNooble(ctx context.Context, sel ast.SelectionSet, v []*model.Nooble) graphql.Marshaler {

@@ -40,15 +40,13 @@ func init() {
 }
 
 type Resolver struct {
-	//nooble     *Nooble
-	//noobleList []*Nooble
 	nooble     *model.Nooble
 	noobleList []*model.Nooble
 }
 
 func (r Resolver) ReadAllNoobles() ([]*model.Nooble, error) {
 	query := fmt.Sprintf(`
-	SELECT
+SELECT
 	title,
 	description,
 	category,
@@ -59,7 +57,6 @@ func (r Resolver) ReadAllNoobles() ([]*model.Nooble, error) {
 		log.Println(err)
 		return nil, err
 	}
-	defer PGclient.Close()
 
 	var nooble model.Nooble
 	for rows.Next() {
@@ -71,6 +68,26 @@ func (r Resolver) ReadAllNoobles() ([]*model.Nooble, error) {
 		r.noobleList = append(r.noobleList, &nooble)
 	}
 	return r.noobleList, nil
+}
+
+func (r Resolver) ReadSingleNooble(id string) (*model.Nooble, error) {
+	sql := fmt.Sprintf(`
+SELECT n.id, n.title, n.category, n.description, n.audio, c.email, c.name
+	 FROM noobles n INNER JOIN creators c
+	 ON n.creator = c.email
+	 WHERE n.id = $1
+	 `)
+	var nooble model.Nooble
+	var creator model.Creator
+	row := database.PGclient.QueryRow(context.TODO(), sql, id)
+	fmt.Println("row read successfully")
+	if err := row.Scan(&nooble.ID, &nooble.Title, &nooble.Category,
+		&nooble.Description, &nooble.Audio, &creator.Email, &creator.Name); err != nil {
+		return nil, err
+	}
+	nooble.Creator = &creator
+	fmt.Println("row scanned successfully")
+	return &nooble, nil
 }
 
 func (r Resolver) PutNooble(obj graphql.Upload) {
@@ -91,7 +108,6 @@ VALUES ($1, $2, $3, $4, $5)`,
 		return
 	}
 	fmt.Println("command Tag ", commandTag)
-	defer PGclient.Close()
 }
 
 func (r Resolver) UploadAudio(obj graphql.Upload) {

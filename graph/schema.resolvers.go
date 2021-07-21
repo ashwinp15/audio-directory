@@ -48,8 +48,8 @@ func (r *queryResolver) Noobles(ctx context.Context) ([]*model.Nooble, error) {
 	return r.ReadAllNoobles()
 }
 
-func (r *queryResolver) Nooble(ctx context.Context, id *string) (*model.Nooble, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Nooble(ctx context.Context, id string) (*model.Nooble, error) {
+	return r.ReadSingleNooble(id)
 }
 
 // Mutation returns generated.MutationResolver implementation.

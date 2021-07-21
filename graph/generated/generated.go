@@ -45,12 +45,12 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Creator struct {
 		Email func(childComplexity int) int
-		ID    func(childComplexity int) int
 		Name  func(childComplexity int) int
 	}
 
 	Mutation struct {
 		CreateNooble func(childComplexity int, input model.NewNooble) int
+		CreateUser   func(childComplexity int, input model.NewCreator) int
 	}
 
 	Nooble struct {
@@ -70,6 +70,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateNooble(ctx context.Context, input model.NewNooble) (*model.Nooble, error)
+	CreateUser(ctx context.Context, input model.NewCreator) (*model.Creator, error)
 }
 type QueryResolver interface {
 	Noobles(ctx context.Context) ([]*model.Nooble, error)
@@ -98,13 +99,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Creator.Email(childComplexity), true
 
-	case "Creator.id":
-		if e.complexity.Creator.ID == nil {
-			break
-		}
-
-		return e.complexity.Creator.ID(childComplexity), true
-
 	case "Creator.name":
 		if e.complexity.Creator.Name == nil {
 			break
@@ -123,6 +117,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateNooble(childComplexity, args["input"].(model.NewNooble)), true
+
+	case "Mutation.createUser":
+		if e.complexity.Mutation.CreateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.NewCreator)), true
 
 	case "Nooble.audio":
 		if e.complexity.Nooble.Audio == nil {
@@ -261,11 +267,10 @@ type Nooble {
   description: String!
   category: String!
   audio: String!
-  creator: Creator
+  creator: Creator!
 }
 
 type Creator {
-  id: ID!
   name: String!
   email: String!
 }
@@ -276,9 +281,9 @@ type Query {
 }
 
 input NewCreator {
-  id: ID!
   name: String!
   email: String!
+  password: String!
 }
 
 input NewNooble{
@@ -286,10 +291,12 @@ input NewNooble{
   description: String!
   category: String!
   file: Upload!
+  creator: String!
 }
 
 type Mutation {
   createNooble(input: NewNooble!): Nooble!
+  createUser(input: NewCreator!): Creator!
 }
 `, BuiltIn: false},
 }
@@ -306,6 +313,21 @@ func (ec *executionContext) field_Mutation_createNooble_args(ctx context.Context
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewNooble2githubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNewNooble(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewCreator
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewCreator2githubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNewCreator(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -381,41 +403,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _Creator_id(ctx context.Context, field graphql.CollectedField, obj *model.Creator) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Creator",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
-}
 
 func (ec *executionContext) _Creator_name(ctx context.Context, field graphql.CollectedField, obj *model.Creator) (ret graphql.Marshaler) {
 	defer func() {
@@ -527,6 +514,48 @@ func (ec *executionContext) _Mutation_createNooble(ctx context.Context, field gr
 	res := resTmp.(*model.Nooble)
 	fc.Result = res
 	return ec.marshalNNooble2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNooble(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateUser(rctx, args["input"].(model.NewCreator))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Creator)
+	fc.Result = res
+	return ec.marshalNCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Nooble_id(ctx context.Context, field graphql.CollectedField, obj *model.Nooble) (ret graphql.Marshaler) {
@@ -729,11 +758,14 @@ func (ec *executionContext) _Nooble_creator(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(*model.Creator)
 	fc.Result = res
-	return ec.marshalOCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx, field.Selections, res)
+	return ec.marshalNCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_noobles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1974,14 +2006,6 @@ func (ec *executionContext) unmarshalInputNewCreator(ctx context.Context, obj in
 
 	for k, v := range asMap {
 		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "name":
 			var err error
 
@@ -1995,6 +2019,14 @@ func (ec *executionContext) unmarshalInputNewCreator(ctx context.Context, obj in
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2042,6 +2074,14 @@ func (ec *executionContext) unmarshalInputNewNooble(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "creator":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("creator"))
+			it.Creator, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -2067,11 +2107,6 @@ func (ec *executionContext) _Creator(ctx context.Context, sel ast.SelectionSet, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Creator")
-		case "id":
-			out.Values[i] = ec._Creator_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "name":
 			out.Values[i] = ec._Creator_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2110,6 +2145,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createNooble":
 			out.Values[i] = ec._Mutation_createNooble(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createUser":
+			out.Values[i] = ec._Mutation_createUser(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2162,6 +2202,9 @@ func (ec *executionContext) _Nooble(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "creator":
 			out.Values[i] = ec._Nooble_creator(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2488,6 +2531,20 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNCreator2githubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx context.Context, sel ast.SelectionSet, v model.Creator) graphql.Marshaler {
+	return ec._Creator(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx context.Context, sel ast.SelectionSet, v *model.Creator) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Creator(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2501,6 +2558,11 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNNewCreator2githubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNewCreator(ctx context.Context, v interface{}) (model.NewCreator, error) {
+	res, err := ec.unmarshalInputNewCreator(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewNooble2githubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐNewNooble(ctx context.Context, v interface{}) (model.NewNooble, error) {
@@ -2803,13 +2865,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
-}
-
-func (ec *executionContext) marshalOCreator2ᚖgithubᚗcomᚋashwinp15ᚋaudioᚑdirectoryᚋgraphᚋmodelᚐCreator(ctx context.Context, sel ast.SelectionSet, v *model.Creator) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Creator(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

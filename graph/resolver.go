@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
-	"os"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/ashwinp15/audio-directory/database"
 	"github.com/ashwinp15/audio-directory/graph/model"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -36,14 +35,8 @@ func init() {
 	}
 	s3client = s3.NewFromConfig(cfg)
 
-	conn, err := pgxpool.Connect(context.TODO(), os.Getenv("POSTGRES_URL"))
-	if err != nil {
-		fmt.Println("Couldn't connnect to database")
-		log.Println(err)
-		return
-	}
-	PGclient = conn
-	fmt.Println("Connected to DB")
+	PGclient = database.PGclient
+
 }
 
 type Resolver struct {
@@ -87,13 +80,12 @@ func (r Resolver) PutNooble(obj graphql.Upload) {
 
 func (r Resolver) addToDB() {
 	query := fmt.Sprintf(
-		`INSERT INTO noobles (id, title, category, description, audio)
+		`INSERT INTO noobles (title, category, description, audio, creator)
 VALUES ($1, $2, $3, $4, $5)`,
 	)
 
-	id := rand.Intn(1000)
 	commandTag, err := PGclient.Exec(context.TODO(), query,
-		id, r.nooble.Title, r.nooble.Category, r.nooble.Description, r.nooble.Audio)
+		r.nooble.Title, r.nooble.Category, r.nooble.Description, r.nooble.Audio, r.nooble.Creator.Email)
 	if err != nil {
 		log.Println(err)
 		return

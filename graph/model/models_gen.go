@@ -7,15 +7,14 @@ import (
 )
 
 type Creator struct {
-	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
 
 type NewCreator struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type NewNooble struct {
@@ -23,6 +22,7 @@ type NewNooble struct {
 	Description string         `json:"description"`
 	Category    string         `json:"category"`
 	File        graphql.Upload `json:"file"`
+	Creator     string         `json:"creator"`
 }
 
 type Nooble struct {

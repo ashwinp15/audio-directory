@@ -14,7 +14,6 @@ type Nooble {
 }
 
 type Creator {
-  id: ID!
   name: String!
   email: String!
 }
@@ -27,6 +26,7 @@ type Query {
 input NewCreator {
   name: String!
   email: String!
+  password: String!
 }
 
 input NewNooble{
@@ -34,9 +34,10 @@ input NewNooble{
   description: String!
   category: String!
   file: Upload!
-  creator: NewCreator!
+  creator: String!
 }
 
 type Mutation {
   createNooble(input: NewNooble!): Nooble!
+  createUser(input: NewCreator!): Creator!
 }

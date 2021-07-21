@@ -22,10 +22,26 @@ func (r *mutationResolver) CreateNooble(ctx context.Context, input model.NewNoob
 		Category:    input.Category,
 		Audio:       input.File.Filename,
 	}
+	user, err := model.GetUserByEmail(input.Creator)
+	if err != nil {
+		return nil, err
+	}
+	r.nooble.Creator = user
 	fmt.Println("mutation resolved successfully")
 	r.PutNooble(input.File)
 	fmt.Println("upload successful")
 	return r.nooble, nil
+}
+
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewCreator) (*model.Creator, error) {
+	user := model.Creator{
+		Name:  input.Name,
+		Email: input.Email,
+	}
+	if err := user.Create(input.Password); err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (r *queryResolver) Noobles(ctx context.Context) ([]*model.Nooble, error) {

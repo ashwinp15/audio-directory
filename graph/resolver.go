@@ -29,6 +29,7 @@ type Resolver struct {
 func (r Resolver) ReadAllNoobles() ([]*model.Nooble, error) {
 	query := fmt.Sprintf(`
 SELECT
+	 id,
 	title,
 	description,
 	category,
@@ -42,7 +43,7 @@ SELECT
 
 	var nooble model.Nooble
 	for rows.Next() {
-		if err := rows.Scan(&nooble.Title, &nooble.Description, &nooble.Category, &nooble.Audio); err != nil {
+		if err := rows.Scan(&nooble.ID, &nooble.Title, &nooble.Description, &nooble.Category, &nooble.Audio); err != nil {
 			log.Println(err)
 			return nil, err
 		}

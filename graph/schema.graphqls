@@ -29,7 +29,7 @@ input NewCreator {
   password: String!
 }
 
-input NewNooble{
+input NewNooble {
   title: String!
   description: String!
   category: String!
@@ -37,7 +37,15 @@ input NewNooble{
   creator: String!
 }
 
+input UpdateNooble {
+  title: String
+  description: String
+  category: String
+}
+
 type Mutation {
-  createNooble(input: NewNooble!): Nooble!
-  createUser(input: NewCreator!): Creator!
+  createNooble(input: NewNooble!): ID
+  updateNooble(id: ID!, input: UpdateNooble!): ID
+  deleteNooble(id: ID!): ID
+  createUser(input: NewCreator!): Creator
 }

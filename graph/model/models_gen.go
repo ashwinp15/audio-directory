@@ -33,3 +33,9 @@ type Nooble struct {
 	Audio       string   `json:"audio"`
 	Creator     *Creator `json:"creator"`
 }
+
+type UpdateNooble struct {
+	Title       *string `json:"title"`
+	Description *string `json:"description"`
+	Category    *string `json:"category"`
+}

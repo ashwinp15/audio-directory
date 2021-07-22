@@ -9,35 +9,17 @@ import (
 	"github.com/ashwinp15/audio-directory/database"
 	"github.com/ashwinp15/audio-directory/graph/model"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-
-	//"github.com/georgysavva/scany/pgxscan"
-	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // This file will not be regenerated automatically.
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
-var s3client *s3.Client
-var PGclient *pgxpool.Pool
-
 const (
 	BUCKET_NAME string = "nooble-bucket"
 	REGION             = "us-east-1"
 )
-
-func init() {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile("coolash"), config.WithRegion("us-east-1"))
-	if err != nil {
-		log.Fatalf("unable to load SDK config, %v", err)
-	}
-	s3client = s3.NewFromConfig(cfg)
-
-	PGclient = database.PGclient
-
-}
 
 type Resolver struct {
 	nooble     *model.Nooble
@@ -52,7 +34,7 @@ SELECT
 	category,
 	audio
 	FROM public.noobles`)
-	rows, err := PGclient.Query(context.TODO(), query)
+	rows, err := database.PGclient.Query(context.TODO(), query)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -71,8 +53,9 @@ SELECT
 }
 
 func (r Resolver) ReadSingleNooble(id string) (*model.Nooble, error) {
-	sql := fmt.Sprintf(`
-SELECT n.id, n.title, n.category, n.description, n.audio, c.email, c.name
+	sql := fmt.Sprintf(
+		`
+	 SELECT n.id, n.title, n.category, n.description, n.audio, c.email, c.name
 	 FROM noobles n INNER JOIN creators c
 	 ON n.creator = c.email
 	 WHERE n.id = $1
@@ -90,18 +73,69 @@ SELECT n.id, n.title, n.category, n.description, n.audio, c.email, c.name
 	return &nooble, nil
 }
 
+// Updating nooble
+func (r Resolver) UpdateDetails(input *model.UpdateNooble) (*string, error) {
+	sql := fmt.Sprintf(
+		`
+	 UPDATE noobles SET
+	 title = COALESCE($1, title),
+	 category = COALESCE($2, category),
+	 description = COALESCE($3, description)
+	 WHERE id = $4
+	 `)
+
+	commandTag, err := database.PGclient.Exec(context.TODO(), sql,
+		input.Title, input.Category, input.Description, r.nooble.ID)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("%v\n", commandTag)
+	return &r.nooble.ID, nil
+}
+
+func (r Resolver) Delete() (*string, error) {
+	readQuery := fmt.Sprintf(
+		`SELECT audio FROM noobles
+			WHERE id = $1`,
+	)
+	var filename string
+	if err := database.PGclient.QueryRow(context.TODO(), readQuery, r.nooble.ID).Scan(&filename); err != nil {
+		log.Println("Postgres read error: ", err)
+		return nil, err
+	}
+	if _, err := database.S3client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+		Bucket: aws.String(BUCKET_NAME),
+		Key:    aws.String(filename),
+	}); err != nil {
+		log.Println("S3 delete object error: ", err)
+		return nil, err
+	}
+
+	deleteQuery := fmt.Sprintf(
+		`DELETE FROM noobles
+			WHERE id = $1`,
+	)
+	if _, err := database.PGclient.Exec(context.TODO(), deleteQuery, r.nooble.ID); err != nil {
+		log.Println("Postgres delete error", err)
+		return nil, err
+	}
+	return &r.nooble.ID, nil
+}
+
+// Creating new nooble
 func (r Resolver) PutNooble(obj graphql.Upload) {
 	r.UploadAudio(obj)
 	r.addToDB()
 }
 
+// Helper functions for PutNooble
 func (r Resolver) addToDB() {
 	query := fmt.Sprintf(
 		`INSERT INTO noobles (title, category, description, audio, creator)
 VALUES ($1, $2, $3, $4, $5)`,
 	)
 
-	commandTag, err := PGclient.Exec(context.TODO(), query,
+	commandTag, err := database.PGclient.Exec(context.TODO(), query,
 		r.nooble.Title, r.nooble.Category, r.nooble.Description, r.nooble.Audio, r.nooble.Creator.Email)
 	if err != nil {
 		log.Println(err)
@@ -117,7 +151,7 @@ func (r Resolver) UploadAudio(obj graphql.Upload) {
 		Body:   obj.File,
 	}
 
-	resp, err := s3client.PutObject(context.TODO(), input)
+	resp, err := database.S3client.PutObject(context.TODO(), input)
 	if err != nil {
 		log.Println("Couldn't upload object", err)
 	}

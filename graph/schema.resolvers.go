@@ -13,7 +13,7 @@ import (
 	"github.com/ashwinp15/audio-directory/graph/model"
 )
 
-func (r *mutationResolver) CreateNooble(ctx context.Context, input model.NewNooble) (*model.Nooble, error) {
+func (r *mutationResolver) CreateNooble(ctx context.Context, input model.NewNooble) (*string, error) {
 	id := strconv.Itoa(rand.Intn(1000000))
 	r.nooble = &model.Nooble{
 		ID:          id,
@@ -30,7 +30,17 @@ func (r *mutationResolver) CreateNooble(ctx context.Context, input model.NewNoob
 	fmt.Println("mutation resolved successfully")
 	r.PutNooble(input.File)
 	fmt.Println("upload successful")
-	return r.nooble, nil
+	return &r.nooble.ID, nil
+}
+
+func (r *mutationResolver) UpdateNooble(ctx context.Context, id string, input model.UpdateNooble) (*string, error) {
+	r.nooble = &model.Nooble{ID: id}
+	return r.UpdateDetails(&input)
+}
+
+func (r *mutationResolver) DeleteNooble(ctx context.Context, id string) (*string, error) {
+	r.nooble = &model.Nooble{ID: id}
+	return r.Delete()
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewCreator) (*model.Creator, error) {

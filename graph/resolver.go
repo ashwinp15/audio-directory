@@ -129,7 +129,7 @@ func (r Resolver) PutNooble(obj graphql.Upload) {
 	r.addToDB()
 }
 
-// Helper functions for PutNooble
+// Helper functions for PutNooble: addToDB() and UploadAudio()
 func (r Resolver) addToDB() {
 	query := fmt.Sprintf(
 		`INSERT INTO noobles (title, category, description, audio, creator)

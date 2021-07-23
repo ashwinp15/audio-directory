@@ -6,17 +6,13 @@ package graph
 import (
 	"context"
 	"fmt"
-	"math/rand"
-	"strconv"
 
 	"github.com/ashwinp15/audio-directory/graph/generated"
 	"github.com/ashwinp15/audio-directory/graph/model"
 )
 
 func (r *mutationResolver) CreateNooble(ctx context.Context, input model.NewNooble) (*string, error) {
-	id := strconv.Itoa(rand.Intn(1000000))
 	r.nooble = &model.Nooble{
-		ID:          id,
 		Title:       input.Title,
 		Description: input.Description,
 		Category:    input.Category,

@@ -41,8 +41,8 @@ SELECT
 		return nil, err
 	}
 
-	var nooble model.Nooble
 	for rows.Next() {
+		var nooble model.Nooble
 		if err := rows.Scan(&nooble.ID, &nooble.Title, &nooble.Description, &nooble.Category, &nooble.Audio); err != nil {
 			log.Println(err)
 			return nil, err
@@ -133,16 +133,16 @@ func (r Resolver) PutNooble(obj graphql.Upload) {
 func (r Resolver) addToDB() {
 	query := fmt.Sprintf(
 		`INSERT INTO noobles (title, category, description, audio, creator)
-VALUES ($1, $2, $3, $4, $5)`,
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id`,
 	)
 
-	commandTag, err := database.PGclient.Exec(context.TODO(), query,
-		r.nooble.Title, r.nooble.Category, r.nooble.Description, r.nooble.Audio, r.nooble.Creator.Email)
+	err := database.PGclient.QueryRow(context.TODO(), query,
+		r.nooble.Title, r.nooble.Category, r.nooble.Description, r.nooble.Audio, r.nooble.Creator.Email).Scan(&r.nooble.ID)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	fmt.Println("command Tag ", commandTag)
 }
 
 func (r Resolver) UploadAudio(obj graphql.Upload) {

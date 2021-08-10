@@ -1,3 +1,7 @@
+## Overview
+This is a graphql API for a server to store short audio bits called ``noobles``. It was a hiring challenge which I had a lot of fun developing
+and learned a lot from. <br>
+As of now there is only the API implementation which can be tested using the instructions given below. Shortly, I am also planning to adding a frontend to this project.
 
 ## Requisites
 You need to have the Altair GraphQL client which provides very easy to use and feature rich client (in this case, easy file uploads). <br>

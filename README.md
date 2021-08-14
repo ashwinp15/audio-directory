@@ -7,9 +7,7 @@ As of now there is only the API implementation which can be tested using the ins
 You need to have the Altair GraphQL client which provides very easy to use and feature rich client (in this case, easy file uploads). <br>
 Download it for your system [here](https://altair.sirmuel.design/#download) or install the [chrome-extension](https://chrome.google.com/webstore/detail/altair-graphql-client/flnheeellpciglgpaodhkhmapeljopja?hl=en) or [firefox-extension](https://addons.mozilla.org/en-US/firefox/addon/altair-graphql-client/).
 
-This server is hosted on and EC2 instance. 
-All the requests will be served on the following endpoint. Copy this URL into your Altair address bar for making the requests. <br>
-http://ec2-3-237-97-25.compute-1.amazonaws.com:8080/query
+It's not hosted at the moment. I'm building a beautiful and usable frontend for this service and plan to make it live after that.
 
 
 ## Usage 
